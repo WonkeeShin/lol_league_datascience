@@ -1,0 +1,5 @@
+url_LCS2019_SeasonSpring_Season.txt
+url_LCS2019_SeasonSpring_Playoffs.txt
+url_LCS2019_SeasonSummer_Season.txt
+url_LCS2019_SeasonSummer_Playoffs.txt
+url_LCS2019_SeasonRegional_Finals.txt
