@@ -1,0 +1,5 @@
+url_LEC2019_SeasonSpring_Season.txt
+url_LEC2019_SeasonSpring_Playoffs.txt
+url_LEC2019_SeasonSummer_Season.txt
+url_LEC2019_SeasonSummer_Playoffs.txt
+url_LEC2019_SeasonRegional_Finals.txt
