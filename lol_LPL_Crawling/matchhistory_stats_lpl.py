@@ -60,6 +60,7 @@ while True:
     ## head 부분에서 팀 정보 가져오기. 팀 승리, 오브젝트, 킬 수, 골드 수, 밴밴
     head = driver.find_element_by_css_selector('div.data-season')
 
+
     ## 블루 팀
     # 팀 골드 / 팀 킬 수
     team_golds = head.find_elements_by_css_selector('ul.data-main-m li.data-main-m-w2 span.disli')
@@ -69,6 +70,29 @@ while True:
 
     team1list.append(team_gold)
     team1list.append(team_kills)
+
+    # 팀 밴
+    two_bans = head.find_elements_by_css_selector('div.data-main-b')
+    blue_bans = two_bans[0].find_elements_by_css_selector('img')
+    for blue_ban in blue_bans:
+    # 밴
+        ban_name = blue_ban.get_attribute('src').strip()
+        ban_name = ban_name.replace('https://game.gtimg.cn/images/lol/act/img/champion/','').replace('.png', '')
+        print(ban_name)
+        team1list.append(ban_name)
+
+    # 오브젝트 수
+    team_container = head.find_elements_by_css_selector('ul.data-main-m li.data-main-m-w1 div.disul > span')
+    team_baronkill = team_container[0].text.strip()
+    team_dragonkill = team_container[1].text.strip()
+    team_towerkill = team_container[2].text.strip()
+
+    print('타워킬', team_towerkill)
+    print('바론 킬', team_baronkill)
+    print('드래곤 킬', team_dragonkill)
+    team1list.append(team_towerkill)
+    team1list.append(team_baronkill)
+    team1list.append(team_dragonkill)
 
     team_bodys = driver.find_elements_by_css_selector('tr.nr-battle-item')
     # 라인 별 선수 데이터 // 총 5개
@@ -101,17 +125,7 @@ while True:
 #                     # 밴, 타워킬, 억제기킬, 바론킬, 드래곤킬, 전령킬
 #                 team_footer = body[0].find_element_by_css_selector('div > footer div.gs-container')
 #
-#                         # 밴
-#                 team_bans = team_footer.find_elements_by_css_selector('div.champion-nameplate')
-#                 # print()
-#                 # print('bans')
-#
-#
-#                 for ban in team_bans:
-#                     ban = ban.find_element_by_css_selector('div.champion-icon div')
-#                     ban_name = ban.get_attribute('data-rg-id')
-#                     # print(ban_name)
-#                     team1list.append(ban_name)
+
 #
 #                 # print()
 #                         # 타워킬
