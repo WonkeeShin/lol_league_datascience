@@ -119,6 +119,70 @@ while True:
             champion_spell = champion_spell_img.replace("https://ossweb-img.qq.com/images/lol/img/spell/", '')[:-4]
             print(champion_spell)
             team1[index].append(champion_spell)
+    print(team1list)
+    print()
+    ## 레트 팀
+    # 팀 골드 / 팀 킬 수
+    red_team_container = head.find_element_by_css_selector('div.data-main.fr')
+
+    team_gold = red_team_container.find_element_by_css_selector('ul.data-main-m li.data-main-m-w2 span.disli').text.strip()
+    team_kills = head.find_element_by_css_selector('div.data-main-sz p.killnum2').text.strip()
+    print(team_gold, team_kills)
+
+    team2list.append(team_gold)
+    team2list.append(team_kills)
+
+    # 팀 밴
+    red_bans = red_team_container.find_elements_by_css_selector('div.data-main-b img')
+    for red_ban in red_bans:
+        # 밴
+        ban_name = red_ban.get_attribute('src').strip()
+        ban_name = ban_name.replace('https://game.gtimg.cn/images/lol/act/img/champion/', '').replace('.png', '')
+        print(ban_name)
+        team2list.append(ban_name)
+
+    # 오브젝트 수
+    team_container = red_team_container.find_elements_by_css_selector('ul.data-main-m li.data-main-m-w1 div.disul > span')
+    team_baronkill = team_container[0].text.strip()
+    team_dragonkill = team_container[1].text.strip()
+    team_towerkill = team_container[2].text.strip()
+
+    print('타워킬', team_towerkill)
+    print('바론 킬', team_baronkill)
+    print('드래곤 킬', team_dragonkill)
+    team2list.append(team_towerkill)
+    team2list.append(team_baronkill)
+    team2list.append(team_dragonkill)
+
+    team_bodys = driver.find_elements_by_css_selector('tr.nr-battle-item')
+    # 라인 별 선수 데이터 // 총 5개
+
+    for teamplayer in team_bodys:
+        index = team_bodys.index(teamplayer)
+        # print(index)
+
+        player_name = teamplayer.find_element_by_css_selector('div.data-tab-ply2 >p').text.strip()  # 선수 이름
+        champion_names_container = teamplayer.find_elements_by_css_selector('div.data-tab-skill')  # 챔피언 이름 컨테이너
+        champion_names = champion_names_container[1].find_element_by_css_selector('img.out')  # 챔피언 초상화
+        champion_name = champion_names.get_attribute('src').strip()  # 챔피언 초상화 주소
+        champ_name = champion_name.replace('https://game.gtimg.cn/images/lol/act/img/champion/', '')[:-4]  # 챔피언 이름
+
+        print(player_name, champ_name)
+        team2[index].append(player_name)
+        team2[index].append(champ_name)
+
+        # 소환사 주문
+        champion_spells_container = champion_names_container[1].find_element_by_css_selector('div.nr-img-frame')
+        champion_spells = champion_spells_container.find_elements_by_css_selector('img')
+        for spell in champion_spells:
+            champion_spell_img = spell.get_attribute('src').strip()
+            champion_spell = champion_spell_img.replace("https://ossweb-img.qq.com/images/lol/img/spell/", '')[:-4]
+            print(champion_spell)
+            team2[index].append(champion_spell)
+
+
+    print(team2list)
+    print(team2)
     # except:
     #     print('오류')
 #
