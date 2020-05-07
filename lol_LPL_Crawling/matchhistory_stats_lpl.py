@@ -119,7 +119,7 @@ while True:
             champion_spell = champion_spell_img.replace("https://ossweb-img.qq.com/images/lol/img/spell/", '')[:-4]
             print(champion_spell)
             team1[index].append(champion_spell)
-    print(team1list)
+
     print()
     ## 레트 팀
     # 팀 골드 / 팀 킬 수
@@ -181,9 +181,57 @@ while True:
             team2[index].append(champion_spell)
 
 
-    print(team2list)
+    break
+
+while True:
+    driver.find_element_by_css_selector('div.n-data-mode1-data > a:nth-of-type(2)').click() # detail informaiton
+    time.sleep(1)
+    driver.find_element_by_css_selector('dl.damage-dl dd:nth-of-type(1)').click()
+    time.sleep(0.1)
+
+    # Blue KDA, spree, multi
+    kda_container = driver.find_elements_by_css_selector('dl.fight-dl > dd')
+    for n in range(5):
+        kda_container[n].click()
+
+        blue_data_container = driver.find_elements_by_css_selector('div.value-show.fl li.value-wid-li > p')
+        for i in range(len(blue_data_container)):
+            team1[i].append(blue_data_container[i].text.strip())
+            # print(blue_data_container[i].text.strip())
+        # print(team1)
+
+    # Red KDA, spree, multi
+
+        red_data_container = driver.find_elements_by_css_selector('div.value-show.fr li.value-wid-li > p')
+        for i in range(len(red_data_container)):
+            team2[i].append(red_data_container[i].text.strip())
+            # print(red_data_container[i].text.strip())
+        # print(team2)
+        kda_container[n].click()
+
+    # firstblood
+    firstblood_img = driver.find_element_by_css_selector('div.first-blood > img')
+    firstblood_img_src = firstblood_img.get_attribute('src')
+    firstblood = firstblood_img_src.replace('https://game.gtimg.cn/images/lol/act/img/champion/', '').replace('.png', '')
+    print('firstblood', firstblood)
+
+    for i in range(5):
+        if firstblood == team1[i][1]:
+            team1[i].append('●')
+        else:
+            team1[i].append('○')
+
+        if firstblood == team2[i][1]:
+            team2[i].append('●')
+        else:
+            team2[i].append('○')
+
+    print(team1)
     print(team2)
-    # except:
+
+    break
+
+# except:
     #     print('오류')
 #
 #                     # 밴, 타워킬, 억제기킬, 바론킬, 드래곤킬, 전령킬
