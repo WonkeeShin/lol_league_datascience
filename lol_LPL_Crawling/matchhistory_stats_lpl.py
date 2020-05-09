@@ -31,206 +31,281 @@ options.add_argument('window-size=1920x1080')
 
 driver = webdriver.Chrome('./chromedriver', chrome_options=options)
 
-i = 0
+driver.get(pagesource)
+time.sleep(1)
 
-while True:
+matchs = driver.find_elements_by_css_selector('ul.data-mode1-season > li')
 
-    teamlist = []
-    team1list = []
-    team2list = []
+for match in matchs:
+    if matchs.index(match) == 0:
+        pass
+    else:
+        match.click()
 
-    team1top = []
-    team1jg = []
-    team1mid = []
-    team1ad = []
-    team1sp = []
-    team1 = [team1top, team1jg, team1mid, team1ad, team1sp]
+    time.sleep(0.3)
 
-    team2top = []
-    team2jg = []
-    team2mid = []
-    team2ad = []
-    team2sp = []
-    team2 = [team2top, team2jg, team2mid, team2ad, team2sp]
+    driver.find_element_by_css_selector('div.n-data-mode1-data > a:nth-of-type(1)').click()
+    time.sleep(0.3)
+    try:
+        while True:
 
-    # try:
-    driver.get(pagesource)
-    time.sleep(1)
+            teamlist = []
+            team1list = []
+            team2list = []
 
-    ## head 부분에서 팀 정보 가져오기. 팀 승리, 오브젝트, 킬 수, 골드 수, 밴밴
-    head = driver.find_element_by_css_selector('div.data-season')
+            team1top = []
+            team1jg = []
+            team1mid = []
+            team1ad = []
+            team1sp = []
+            team1 = [team1top, team1jg, team1mid, team1ad, team1sp]
+
+            team2top = []
+            team2jg = []
+            team2mid = []
+            team2ad = []
+            team2sp = []
+            team2 = [team2top, team2jg, team2mid, team2ad, team2sp]
+
+            # try:
+            ## head 부분에서 팀 정보 가져오기. 팀 승리, 오브젝트, 킬 수, 골드 수, 밴밴
+            head = driver.find_element_by_css_selector('div.data-season')
+
+            ## 블루 팀
+            # 팀 골드 / 팀 킬 수
+            team_golds = head.find_elements_by_css_selector('ul.data-main-m li.data-main-m-w2 span.disli')
+            team_gold = team_golds[0].text.strip()
+            team_kills = head.find_element_by_css_selector('div.data-main-sz p.killnum1').text.strip()
+            # print(team_gold, team_kills)
+
+            team1list.append(team_gold)
+            team1list.append(team_kills)
+
+            # 팀 밴
+            two_bans = head.find_elements_by_css_selector('div.data-main-b')
+            blue_bans = two_bans[0].find_elements_by_css_selector('img')
+            for blue_ban in blue_bans:
+            # 밴
+                ban_name = blue_ban.get_attribute('src').strip()
+                ban_name = ban_name.replace('https://game.gtimg.cn/images/lol/act/img/champion/','').replace('.png', '')
+                # print(ban_name)
+                team1list.append(ban_name)
+
+            # 오브젝트 수
+            team_container = head.find_elements_by_css_selector('ul.data-main-m li.data-main-m-w1 div.disul > span')
+            team_baronkill = team_container[0].text.strip()
+            team_dragonkill = team_container[1].text.strip()
+            team_towerkill = team_container[2].text.strip()
+
+            # print('타워킬', team_towerkill)
+            # print('바론 킬', team_baronkill)
+            # print('드래곤 킬', team_dragonkill)
+            team1list.append(team_towerkill)
+            team1list.append(team_baronkill)
+            team1list.append(team_dragonkill)
+
+            team_bodys = driver.find_elements_by_css_selector('tr.nr-battle-item')
+            # 라인 별 선수 데이터 // 총 5개
+
+            for teamplayer in team_bodys:
+                index = team_bodys.index(teamplayer)
+                # print(index)
+
+                player_name = teamplayer.find_element_by_css_selector('div.data-tab-ply1 >p').text.strip()   # 선수 이름
+                champion_names_container = teamplayer.find_elements_by_css_selector('div.data-tab-skill') # 챔피언 이름 컨테이너
+                champion_names = champion_names_container[0].find_element_by_css_selector('img.out') # 챔피언 초상화
+                champion_name = champion_names.get_attribute('src').strip() # 챔피언 초상화 주소
+                champ_name = champion_name.replace('https://game.gtimg.cn/images/lol/act/img/champion/','')[:-4] # 챔피언 이름
+
+                # print(player_name, champ_name)
+                team1[index].append(player_name)
+                team1[index].append(champ_name)
+
+                # 소환사 주문
+                champion_spells_container = champion_names_container[0].find_element_by_css_selector('div.nr-img-frame')
+                champion_spells = champion_spells_container.find_elements_by_css_selector('img')
+                for spell in champion_spells:
+                    champion_spell_img = spell.get_attribute('src').strip()
+                    champion_spell = champion_spell_img.replace("https://ossweb-img.qq.com/images/lol/img/spell/", '')[:-4]
+                    # print(champion_spell)
+                    team1[index].append(champion_spell)
+
+            print()
+            ## 레트 팀
+            # 팀 골드 / 팀 킬 수
+            red_team_container = head.find_element_by_css_selector('div.data-main.fr')
+
+            team_gold = red_team_container.find_element_by_css_selector('ul.data-main-m li.data-main-m-w2 span.disli').text.strip()
+            team_kills = head.find_element_by_css_selector('div.data-main-sz p.killnum2').text.strip()
+            # print(team_gold, team_kills)
+
+            team2list.append(team_gold)
+            team2list.append(team_kills)
+
+            # 팀 밴
+            red_bans = red_team_container.find_elements_by_css_selector('div.data-main-b img')
+            for red_ban in red_bans:
+                # 밴
+                ban_name = red_ban.get_attribute('src').strip()
+                ban_name = ban_name.replace('https://game.gtimg.cn/images/lol/act/img/champion/', '').replace('.png', '')
+                # print(ban_name)
+                team2list.append(ban_name)
+
+            # 오브젝트 수
+            team_container = red_team_container.find_elements_by_css_selector('ul.data-main-m li.data-main-m-w1 div.disul > span')
+            team_baronkill = team_container[0].text.strip()
+            team_dragonkill = team_container[1].text.strip()
+            team_towerkill = team_container[2].text.strip()
+
+            # print('타워킬', team_towerkill)
+            # print('바론 킬', team_baronkill)
+            # print('드래곤 킬', team_dragonkill)
+            team2list.append(team_towerkill)
+            team2list.append(team_baronkill)
+            team2list.append(team_dragonkill)
+
+            team_bodys = driver.find_elements_by_css_selector('tr.nr-battle-item')
+            # 라인 별 선수 데이터 // 총 5개
+
+            for teamplayer in team_bodys:
+                index = team_bodys.index(teamplayer)
+                # print(index)
+
+                player_name = teamplayer.find_element_by_css_selector('div.data-tab-ply2 >p').text.strip()  # 선수 이름
+                champion_names_container = teamplayer.find_elements_by_css_selector('div.data-tab-skill')  # 챔피언 이름 컨테이너
+                champion_names = champion_names_container[1].find_element_by_css_selector('img.out')  # 챔피언 초상화
+                champion_name = champion_names.get_attribute('src').strip()  # 챔피언 초상화 주소
+                champ_name = champion_name.replace('https://game.gtimg.cn/images/lol/act/img/champion/', '')[:-4]  # 챔피언 이름
+
+                # print(player_name, champ_name)
+                team2[index].append(player_name)
+                team2[index].append(champ_name)
+
+                # 소환사 주문
+                champion_spells_container = champion_names_container[1].find_element_by_css_selector('div.nr-img-frame')
+                champion_spells = champion_spells_container.find_elements_by_css_selector('img')
+                for spell in champion_spells:
+                    champion_spell_img = spell.get_attribute('src').strip()
+                    champion_spell = champion_spell_img.replace("https://ossweb-img.qq.com/images/lol/img/spell/", '')[:-4]
+                    # print(champion_spell)
+                    team2[index].append(champion_spell)
+            break
+    except:
+        driver.refresh()
+        time.sleep(2)
 
 
-    ## 블루 팀
-    # 팀 골드 / 팀 킬 수
-    team_golds = head.find_elements_by_css_selector('ul.data-main-m li.data-main-m-w2 span.disli')
-    team_gold = team_golds[0].text.strip()
-    team_kills = head.find_element_by_css_selector('div.data-main-sz p.killnum1').text.strip()
-    print(team_gold, team_kills)
+    try:
+        while True:
+            # detail informaiton tab
+            driver.find_element_by_css_selector('div.n-data-mode1-data > a:nth-of-type(2)').click()
+            time.sleep(1)
 
-    team1list.append(team_gold)
-    team1list.append(team_kills)
+            # clicked data reset.
+            if matchs.index(match) == 0:
+                driver.find_element_by_css_selector('dl.damage-dl dd:nth-of-type(1)').click()
+                time.sleep(0.3)
 
-    # 팀 밴
-    two_bans = head.find_elements_by_css_selector('div.data-main-b')
-    blue_bans = two_bans[0].find_elements_by_css_selector('img')
-    for blue_ban in blue_bans:
-    # 밴
-        ban_name = blue_ban.get_attribute('src').strip()
-        ban_name = ban_name.replace('https://game.gtimg.cn/images/lol/act/img/champion/','').replace('.png', '')
-        print(ban_name)
-        team1list.append(ban_name)
+            # Blue KDA, spree, multi
+            kda_container = driver.find_elements_by_css_selector('dl.fight-dl > dd')
+            for n in range(5):
+                kda_container[n].click()
 
-    # 오브젝트 수
-    team_container = head.find_elements_by_css_selector('ul.data-main-m li.data-main-m-w1 div.disul > span')
-    team_baronkill = team_container[0].text.strip()
-    team_dragonkill = team_container[1].text.strip()
-    team_towerkill = team_container[2].text.strip()
+                blue_data_container = driver.find_elements_by_css_selector('div.value-show.fl li.value-wid-li > p')
+                for i in range(len(blue_data_container)):
+                    team1[i].append(blue_data_container[i].text.strip())
+                    # print(blue_data_container[i].text.strip())
+                # print(team1)
 
-    print('타워킬', team_towerkill)
-    print('바론 킬', team_baronkill)
-    print('드래곤 킬', team_dragonkill)
-    team1list.append(team_towerkill)
-    team1list.append(team_baronkill)
-    team1list.append(team_dragonkill)
+            # Red KDA, spree, multi
 
-    team_bodys = driver.find_elements_by_css_selector('tr.nr-battle-item')
-    # 라인 별 선수 데이터 // 총 5개
+                red_data_container = driver.find_elements_by_css_selector('div.value-show.fr li.value-wid-li > p')
+                for i in range(len(red_data_container)):
+                    team2[i].append(red_data_container[i].text.strip())
+                    # print(red_data_container[i].text.strip())
+                # print(team2)
+                kda_container[n].click()
 
-    for teamplayer in team_bodys:
-        index = team_bodys.index(teamplayer)
-        # print(index)
+            # firstblood
+            firstblood_img = driver.find_element_by_css_selector('div.first-blood > img')
+            firstblood_img_src = firstblood_img.get_attribute('src')
+            firstblood = firstblood_img_src.replace('https://game.gtimg.cn/images/lol/act/img/champion/', '').replace('.png', '')
+            # print('firstblood', firstblood)
 
-        player_name = teamplayer.find_element_by_css_selector('div.data-tab-ply1 >p').text.strip()   # 선수 이름
-        champion_names_container = teamplayer.find_elements_by_css_selector('div.data-tab-skill') # 챔피언 이름 컨테이너
-        champion_names = champion_names_container[0].find_element_by_css_selector('img.out') # 챔피언 초상화
-        champion_name = champion_names.get_attribute('src').strip() # 챔피언 초상화 주소
-        champ_name = champion_name.replace('https://game.gtimg.cn/images/lol/act/img/champion/','')[:-4] # 챔피언 이름
+            for i in range(5):
+                if firstblood == team1[i][1]:
+                    team1[i].append('●')
+                else:
+                    team1[i].append('○')
 
-        print(player_name, champ_name)
-        team1[index].append(player_name)
-        team1[index].append(champ_name)
-
-        # 소환사 주문
-        champion_spells_container = champion_names_container[0].find_element_by_css_selector('div.nr-img-frame')
-        champion_spells = champion_spells_container.find_elements_by_css_selector('img')
-        for spell in champion_spells:
-            champion_spell_img = spell.get_attribute('src').strip()
-            champion_spell = champion_spell_img.replace("https://ossweb-img.qq.com/images/lol/img/spell/", '')[:-4]
-            print(champion_spell)
-            team1[index].append(champion_spell)
-
-    print()
-    ## 레트 팀
-    # 팀 골드 / 팀 킬 수
-    red_team_container = head.find_element_by_css_selector('div.data-main.fr')
-
-    team_gold = red_team_container.find_element_by_css_selector('ul.data-main-m li.data-main-m-w2 span.disli').text.strip()
-    team_kills = head.find_element_by_css_selector('div.data-main-sz p.killnum2').text.strip()
-    print(team_gold, team_kills)
-
-    team2list.append(team_gold)
-    team2list.append(team_kills)
-
-    # 팀 밴
-    red_bans = red_team_container.find_elements_by_css_selector('div.data-main-b img')
-    for red_ban in red_bans:
-        # 밴
-        ban_name = red_ban.get_attribute('src').strip()
-        ban_name = ban_name.replace('https://game.gtimg.cn/images/lol/act/img/champion/', '').replace('.png', '')
-        print(ban_name)
-        team2list.append(ban_name)
-
-    # 오브젝트 수
-    team_container = red_team_container.find_elements_by_css_selector('ul.data-main-m li.data-main-m-w1 div.disul > span')
-    team_baronkill = team_container[0].text.strip()
-    team_dragonkill = team_container[1].text.strip()
-    team_towerkill = team_container[2].text.strip()
-
-    print('타워킬', team_towerkill)
-    print('바론 킬', team_baronkill)
-    print('드래곤 킬', team_dragonkill)
-    team2list.append(team_towerkill)
-    team2list.append(team_baronkill)
-    team2list.append(team_dragonkill)
-
-    team_bodys = driver.find_elements_by_css_selector('tr.nr-battle-item')
-    # 라인 별 선수 데이터 // 총 5개
-
-    for teamplayer in team_bodys:
-        index = team_bodys.index(teamplayer)
-        # print(index)
-
-        player_name = teamplayer.find_element_by_css_selector('div.data-tab-ply2 >p').text.strip()  # 선수 이름
-        champion_names_container = teamplayer.find_elements_by_css_selector('div.data-tab-skill')  # 챔피언 이름 컨테이너
-        champion_names = champion_names_container[1].find_element_by_css_selector('img.out')  # 챔피언 초상화
-        champion_name = champion_names.get_attribute('src').strip()  # 챔피언 초상화 주소
-        champ_name = champion_name.replace('https://game.gtimg.cn/images/lol/act/img/champion/', '')[:-4]  # 챔피언 이름
-
-        print(player_name, champ_name)
-        team2[index].append(player_name)
-        team2[index].append(champ_name)
-
-        # 소환사 주문
-        champion_spells_container = champion_names_container[1].find_element_by_css_selector('div.nr-img-frame')
-        champion_spells = champion_spells_container.find_elements_by_css_selector('img')
-        for spell in champion_spells:
-            champion_spell_img = spell.get_attribute('src').strip()
-            champion_spell = champion_spell_img.replace("https://ossweb-img.qq.com/images/lol/img/spell/", '')[:-4]
-            print(champion_spell)
-            team2[index].append(champion_spell)
+                if firstblood == team2[i][1]:
+                    team2[i].append('●')
+                else:
+                    team2[i].append('○')
 
 
-    break
+            # damage tab
+            # total Damage to Champ , ad damage to Champ, ap damage to Champ, Total Damage, Ad damage , Ap damage, Largest critical damage
+            damage_tab_container = driver.find_elements_by_css_selector('dl.damage-dl > dd')
+            for n in range(len(damage_tab_container)):
+                # fold the data
+                damage_tab_container[n].click()
 
-while True:
-    driver.find_element_by_css_selector('div.n-data-mode1-data > a:nth-of-type(2)').click() # detail informaiton
-    time.sleep(1)
-    driver.find_element_by_css_selector('dl.damage-dl dd:nth-of-type(1)').click()
-    time.sleep(0.1)
+                blue_data_container = driver.find_elements_by_css_selector('div.value-show.fl li.value-wid-li > p')
+                for i in range(len(blue_data_container)):
+                    team1[i].append(blue_data_container[i].text.strip())
+                    # print(blue_data_container[i].text.strip())
 
-    # Blue KDA, spree, multi
-    kda_container = driver.find_elements_by_css_selector('dl.fight-dl > dd')
-    for n in range(5):
-        kda_container[n].click()
+                red_data_container = driver.find_elements_by_css_selector('div.value-show.fr li.value-wid-li > p')
+                for i in range(len(red_data_container)):
+                    team2[i].append(red_data_container[i].text.strip())
 
-        blue_data_container = driver.find_elements_by_css_selector('div.value-show.fl li.value-wid-li > p')
-        for i in range(len(blue_data_container)):
-            team1[i].append(blue_data_container[i].text.strip())
-            # print(blue_data_container[i].text.strip())
-        # print(team1)
+                # unfold the data
+                damage_tab_container[n].click()
 
-    # Red KDA, spree, multi
+            # taken damage, heal tab
+            # Heal, TakenDamage, AdDamage, ApDamage
+            taken_tab_container = driver.find_elements_by_css_selector('dl.treatment-dl > dd')
+            for n in range(len(taken_tab_container)):
+                # fold the data
+                taken_tab_container[n].click()
 
-        red_data_container = driver.find_elements_by_css_selector('div.value-show.fr li.value-wid-li > p')
-        for i in range(len(red_data_container)):
-            team2[i].append(red_data_container[i].text.strip())
-            # print(red_data_container[i].text.strip())
-        # print(team2)
-        kda_container[n].click()
+                blue_data_container = driver.find_elements_by_css_selector('div.value-show.fl li.value-wid-li > p')
+                for i in range(len(blue_data_container)):
+                    team1[i].append(blue_data_container[i].text.strip())
 
-    # firstblood
-    firstblood_img = driver.find_element_by_css_selector('div.first-blood > img')
-    firstblood_img_src = firstblood_img.get_attribute('src')
-    firstblood = firstblood_img_src.replace('https://game.gtimg.cn/images/lol/act/img/champion/', '').replace('.png', '')
-    print('firstblood', firstblood)
+                red_data_container = driver.find_elements_by_css_selector('div.value-show.fr li.value-wid-li > p')
+                for i in range(len(red_data_container)):
+                    team2[i].append(red_data_container[i].text.strip())
 
-    for i in range(5):
-        if firstblood == team1[i][1]:
-            team1[i].append('●')
-        else:
-            team1[i].append('○')
+                # unfold the data
+                taken_tab_container[n].click()
 
-        if firstblood == team2[i][1]:
-            team2[i].append('●')
-        else:
-            team2[i].append('○')
+            # others
+            # Money, Towerkill, Minions, TimeDeath, Level
+            other_tab_container = driver.find_elements_by_css_selector('dl.other-dl > dd')
+            for n in range(len(other_tab_container)):
+                # fold the data
+                other_tab_container[n].click()
 
-    print(team1)
-    print(team2)
+                blue_data_container = driver.find_elements_by_css_selector('div.value-show.fl li.value-wid-li > p')
+                for i in range(len(blue_data_container)):
+                    team1[i].append(blue_data_container[i].text.strip())
 
-    break
+                red_data_container = driver.find_elements_by_css_selector('div.value-show.fr li.value-wid-li > p')
+                for i in range(len(red_data_container)):
+                    team2[i].append(red_data_container[i].text.strip())
 
+                # unfold the data
+                other_tab_container[n].click()
+
+            print(team1)
+            print(team2)
+
+            break
+    except:
+        driver.refresh()
+        time.sleep(2)
 # except:
     #     print('오류')
 #
